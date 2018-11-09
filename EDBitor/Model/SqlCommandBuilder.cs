@@ -9,53 +9,63 @@ namespace EDBitor.Model
         public static SQLiteCommand Select(this SQLiteCommand command, params string[] columns)
         {
             var columnNames = columns == null ? "*" : string.Join(", ", columns);
-            command.CommandText = string.Format("select {0} ", columnNames);
+            command.CommandText = $"select {columnNames} ";
 
             return command;
         }
 
         public static SQLiteCommand From(this SQLiteCommand command, string table)
         {
-            command.CommandText = string.Format("{0} from {1} ", command.CommandText, table);
+            command.CommandText = $"{command.CommandText} from {table} ";
             return command;
         }
 
         public static SQLiteCommand Where(this SQLiteCommand command, string conditionFormat, params object[] args)
         {
             var condition = string.Format(conditionFormat, args);
-            command.CommandText = string.Format("{0} where {1} ", command.CommandText, condition);
+            command.CommandText = $"{command.CommandText} where {condition} ";
             return command;
         }
 
         public static SQLiteCommand InsertInto(this SQLiteCommand command, string table, params string[] columns)
         {
-            command.CommandText = string.Format("insert into {0} ({1}) ", table, string.Join(", ", columns));
+            command.CommandText = $"insert into {table} ({string.Join(", ", columns)}) ";
             return command;
         }
 
         public static SQLiteCommand Values(this SQLiteCommand command, params string[] values)
         {
-            command.CommandText = string.Format("{0} values ({1}) ", command.CommandText, string.Join(", ", values));
+            command.CommandText = $"{command.CommandText} values ({string.Join(", ", values)}) ";
+            return command;
+        }
+
+        public static SQLiteCommand GetLastInsertedId(this SQLiteCommand command, params string[] values)
+        {
+            const string getLastInsertedIdCommand = "select last_insert_rowid();";
+            command.CommandText = string.IsNullOrEmpty(command.CommandText) 
+                ? $"{getLastInsertedIdCommand};"
+                : $"{command.CommandText}; {getLastInsertedIdCommand};";
+
             return command;
         }
 
         public static SQLiteCommand Update(this SQLiteCommand command, string table)
         {
-            command.CommandText = string.Format("update {0} ", table);
+            command.CommandText = $"update {table} ";
             return command;
         }
 
         public static SQLiteCommand Set(this SQLiteCommand command, Tuple<string, string>[] values)
         {
             const int capacity = 128;
-            StringBuilder setList = new StringBuilder(capacity);
+            var setList = new StringBuilder(capacity);
             for (int i = 0; i < values.Length; i++)
             {
                 var kv = values[i];
                 setList.AppendFormat("{0}={1}", kv.Item1, kv.Item2);
             }
 
-            command.CommandText = string.Format("{0} set {1} ", command.CommandText, setList);
+            command.CommandText = $"{command.CommandText} set {setList} ";
             return command;
         }
 

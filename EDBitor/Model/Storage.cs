@@ -19,14 +19,13 @@ namespace EDBitor.Model
                 public const string File = "file";
                 public const string Data = "data";
             }
-            
         }
 
         private readonly DataCompressor _compressor;
         private readonly SQLiteConnectionFactory _connectionFactory;
 
         private bool _isStorageEdited;
-        private Dictionary<int, FileInfo> _fileInfos;
+        private List<FileInfo> _fileInfos;
 
         public Storage(DataCompressor compressor)
         {
@@ -38,12 +37,12 @@ namespace EDBitor.Model
 
         #region Operations
 
-        public IReadOnlyDictionary<int, FileInfo> GetFileList()
+        public IReadOnlyList<FileInfo> GetFileList()
         {
             if (!_isStorageEdited && _fileInfos != null)
                 return _fileInfos;
 
-            _fileInfos = new Dictionary<int, FileInfo>();
+            _fileInfos = new List<FileInfo>();
 
             using (var connection = _connectionFactory.CreateConnection().OpenAndReturn())
             using (var command = connection.CreateCommand()
@@ -54,8 +53,8 @@ namespace EDBitor.Model
                 {
                     var id = reader.GetInt32(0);
                     var fileName = reader.GetString(1);
-                    var info = new FileInfo { Id = id, FileName = fileName };
-                    _fileInfos.Add(id, info);
+                    var info = new FileInfo(id, fileName);
+                    _fileInfos.Add(info);
                 });
             }
 
@@ -63,32 +62,15 @@ namespace EDBitor.Model
             return _fileInfos;
         }
 
-        public void SaveFile(FileInfo info, string file)
+        public string GetFile(int id)
         {
-            if (string.IsNullOrEmpty(info.FileName))
-                throw new ArgumentException("File name can't be null or empty string", nameof(info));
-
-            if (string.IsNullOrEmpty(file))
-                throw new ArgumentException("File can't be null or empty string", nameof(file));
-
-            if (info.Id == null)
-                AddFile(info, file);
-            else
-                UpdateFile(info, file);
-        }
-
-        public string GetFile(FileInfo info)
-        {
-            if (info.Id == null)
-                throw new ArgumentException("File id can't be null for open operation.", nameof(info));
-
             var file = string.Empty;
 
             using (var connection = _connectionFactory.CreateConnection().OpenAndReturn())
             using (var command = connection.CreateCommand()
                                             .Select(Scheme.Columns.Data)
                                             .From(Scheme.Table)
-                                            .Where("{0}={1}", Scheme.Columns.Id, info.Id.Value.ToString()))
+                                            .Where("{0}={1}", Scheme.Columns.Id, id.ToString()))
             {
                 Read(command, reader =>
                 {
@@ -100,6 +82,53 @@ namespace EDBitor.Model
             return file;
         }
 
+        public int AddFile(string fileName, string file)
+        {
+            if (string.IsNullOrEmpty(fileName))
+                throw new ArgumentException("File name can't be null or empty string", nameof(fileName));
+
+            if (string.IsNullOrEmpty(file))
+                throw new ArgumentException("File can't be null or empty string", nameof(file));
+
+            const string fileParam = "@file";
+            const string dataParam = "@data";
+
+            int insertedId;
+            using (var connection = _connectionFactory.CreateConnection().OpenAndReturn())
+            using (var command = connection.CreateCommand()
+                                            .InsertInto(Scheme.Table, Scheme.Columns.File, Scheme.Columns.Data)
+                                            .Values(fileParam, dataParam)
+                                            .GetLastInsertedId())
+            {
+                command.Parameters.Add(fileParam, DbType.String).Value = fileName;
+                command.Parameters.Add(dataParam, DbType.Binary).Value = _compressor.Compress(file);
+                insertedId = (int)command.ExecuteScalar();
+            }
+
+            _isStorageEdited = true;
+            return insertedId;
+        }
+
+        public void UpdateFile(int id, string file)
+        {
+            if (string.IsNullOrEmpty(file))
+                throw new ArgumentException("File can't be null or empty string", nameof(file));
+
+            const string dataParam = "@data";
+
+            using (var connection = _connectionFactory.CreateConnection().OpenAndReturn())
+            using (var command = connection.CreateCommand()
+                                            .Update(Scheme.Table)
+                                            .Set(new[] { new Tuple<string, string>("data", dataParam) })
+                                            .Where("{0}={1}", Scheme.Columns.Id, id))
+            {
+                command.Parameters.Add(dataParam, DbType.Binary).Value = _compressor.Compress(file);
+                command.ExecuteNonQuery();
+            }
+
+            _isStorageEdited = true;
+        }
+
         public void DeleteFile(FileInfo info)
         {
             if (info.Id == null)
@@ -107,9 +136,9 @@ namespace EDBitor.Model
 
             using (var connection = _connectionFactory.CreateConnection().OpenAndReturn())
             using (var command = connection.CreateCommand()
-                                            .Delete()
-                                            .From(Scheme.Table)
-                                            .Where("{0}={1}", Scheme.Columns.Id, info.Id.Value.ToString()))
+                .Delete()
+                .From(Scheme.Table)
+                .Where("{0}={1}", Scheme.Columns.Id, info.Id.Value.ToString()))
             {
                 command.ExecuteNonQuery();
             }
@@ -117,40 +146,9 @@ namespace EDBitor.Model
             _isStorageEdited = true;
         }
 
-        private void AddFile(FileInfo info, string file)
-        {
-            const string fileParam = "@file";
-            const string dataParam = "@data";
+        #endregion
 
-            using (var connection = _connectionFactory.CreateConnection().OpenAndReturn())
-            using (var command = connection.CreateCommand()
-                                            .InsertInto(Scheme.Table, Scheme.Columns.File, Scheme.Columns.Data)
-                                            .Values(fileParam, dataParam))
-            {
-                command.Parameters.Add(fileParam, DbType.String).Value = info.FileName;
-                command.Parameters.Add(dataParam, DbType.Binary).Value = _compressor.Compress(file);
-                command.ExecuteNonQuery();
-            }
-
-            _isStorageEdited = true;
-        }
-
-        private void UpdateFile(FileInfo info, string file)
-        {
-            const string dataParam = "@data";
-
-            using (var connection = _connectionFactory.CreateConnection().OpenAndReturn())
-            using (var command = connection.CreateCommand()
-                                            .Update(Scheme.Table)
-                                            .Set(new[] { new Tuple<string, string>("data", dataParam) })
-                                            .Where("{0}={1}", Scheme.Columns.Id, info.Id))
-            {
-                command.Parameters.Add(dataParam, DbType.Binary).Value = _compressor.Compress(file);
-                command.ExecuteNonQuery();
-            }
-
-            _isStorageEdited = true;
-        }
+        #region Helpers
 
         private void Read(SQLiteCommand command, Action<SQLiteDataReader> forEach)
         {
@@ -160,10 +158,6 @@ namespace EDBitor.Model
                     forEach(reader);
             }
         }
-
-        #endregion
-
-        #region Helpers
 
         private byte[] GetBytesFrom(SQLiteDataReader reader)
         {

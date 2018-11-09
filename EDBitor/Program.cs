@@ -13,7 +13,10 @@ namespace EDBitor
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
+
+            EDBitorApp.Instance.Start();
+
+            Application.Run();
         }
     }
 }
