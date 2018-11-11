@@ -22,7 +22,7 @@ namespace EDBitor
 
         public void Open<TController>()
             where TController : FormController, new()
-        {
+        { 
             var builder = _formBuilders[typeof(TController)];
             var form = builder();
             var controller = new TController();
@@ -68,12 +68,14 @@ namespace EDBitor
 
         #endregion
 
+        #region Helpers
+
         private Dictionary<Type, Func<Form>> BuildFactories()
         {
             return new Dictionary<Type, Func<Form>>
             {
                 { typeof(EditorController), () => new EditorForm() },
-                { typeof(OpenFileController), () => new OpenFileFromDbDialog() },
+                { typeof(SelectFileFromDbController), () => new SelectFileFromDbDialog() },
                 { typeof(EnterFileNameController), () => new EnterFileNameDialog() },
             };
         }
@@ -84,5 +86,7 @@ namespace EDBitor
             var initializable = controller as IInitializableController;
             initializable.Initialize(form, EDBitorApp.Instance);
         }
+
+        #endregion
     }
 }

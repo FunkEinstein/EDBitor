@@ -1,5 +1,4 @@
-﻿using System.IO;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using EDBitor.Controllers.Base;
 using EDBitor.View;
 using EDBitor.View.MessageBoxShowers;
@@ -8,7 +7,12 @@ namespace EDBitor.Controllers
 {
     class EnterFileNameController : DialogController<EnterFileNameDialog, string>
     {
-        private readonly WarningMessageBoxShower _messageBoxShower;
+        // Based on https://docs.microsoft.com/ru-ru/windows/desktop/FileIO/naming-a-file
+        private const string FileNamePattern =
+            "^\\A(?!(?:COM[0-9]|CON|LPT[0-9]|NUL|PRN|AUX|com[0-9]|con|lpt[0-9]|nul|prn|aux)|[\\s\\.])" +
+            "[^\\/:*\"?<>|]{1,254}\\z";
+
+        private readonly MessageBoxShower _messageBoxShower;
 
         public EnterFileNameController()
         {
@@ -29,12 +33,10 @@ namespace EDBitor.Controllers
                 return;
             }
 
-            var invalidChars = string.Join("", Path.GetInvalidFileNameChars());
-            var pattern = $"^[{invalidChars}]+";
-            var regex = new Regex(pattern);
+            var regex = new Regex(FileNamePattern);
             if (!regex.IsMatch(name))
             {
-                _messageBoxShower.Show($"File name doesn't allow next chars {invalidChars}");
+                _messageBoxShower.Show("Invalid file name");
                 return;
             }
 

@@ -4,6 +4,7 @@ using System.Configuration;
 using System.Data;
 using System.Data.SQLite;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace EDBitor.Model
 {
@@ -37,7 +38,7 @@ namespace EDBitor.Model
 
         #region Operations
 
-        public IReadOnlyList<FileInfo> GetFileList()
+        public async Task<List<FileInfo>> GetFileList()
         {
             if (!_isStorageEdited && _fileInfos != null)
                 return _fileInfos;
@@ -47,9 +48,10 @@ namespace EDBitor.Model
             using (var connection = _connectionFactory.CreateConnection().OpenAndReturn())
             using (var command = connection.CreateCommand()
                                             .Select(Scheme.Columns.Id, Scheme.Columns.File)
-                                            .From(Scheme.Table))
+                                            .From(Scheme.Table)
+                                            .Async())
             {
-                Read(command, reader =>
+                await Read(command, reader =>
                 {
                     var id = reader.GetInt32(0);
                     var fileName = reader.GetString(1);
@@ -62,17 +64,22 @@ namespace EDBitor.Model
             return _fileInfos;
         }
 
-        public string GetFile(int id)
+        public async Task<string> GetFile(int id)
         {
+            if (id <= 0)
+                throw new ArgumentException("File id can't be equal or less zero for get operation.", nameof(id));
+
+
             var file = string.Empty;
 
             using (var connection = _connectionFactory.CreateConnection().OpenAndReturn())
             using (var command = connection.CreateCommand()
                                             .Select(Scheme.Columns.Data)
                                             .From(Scheme.Table)
-                                            .Where("{0}={1}", Scheme.Columns.Id, id.ToString()))
+                                            .Where("{0}={1}", Scheme.Columns.Id, id.ToString())
+                                            .Async())
             {
-                Read(command, reader =>
+                await Read(command, reader =>
                 {
                     var blob = GetBytesFrom(reader);
                     file = _compressor.Decompress(blob);
@@ -82,7 +89,7 @@ namespace EDBitor.Model
             return file;
         }
 
-        public int AddFile(string fileName, string file)
+        public async Task<int> AddFile(string fileName, string file)
         {
             if (string.IsNullOrEmpty(fileName))
                 throw new ArgumentException("File name can't be null or empty string", nameof(fileName));
@@ -98,19 +105,23 @@ namespace EDBitor.Model
             using (var command = connection.CreateCommand()
                                             .InsertInto(Scheme.Table, Scheme.Columns.File, Scheme.Columns.Data)
                                             .Values(fileParam, dataParam)
-                                            .GetLastInsertedId())
+                                            .GetLastInsertedId()
+                                            .Async())
             {
                 command.Parameters.Add(fileParam, DbType.String).Value = fileName;
                 command.Parameters.Add(dataParam, DbType.Binary).Value = _compressor.Compress(file);
-                insertedId = (int)command.ExecuteScalar();
+                insertedId = (int)(long) await command.ExecuteScalar();
             }
 
             _isStorageEdited = true;
             return insertedId;
         }
 
-        public void UpdateFile(int id, string file)
+        public async Task UpdateFile(int id, string file)
         {
+            if (id <= 0)
+                throw new ArgumentException("File id can't be equal or less zero for update operation.", nameof(id));
+
             if (string.IsNullOrEmpty(file))
                 throw new ArgumentException("File can't be null or empty string", nameof(file));
 
@@ -120,27 +131,29 @@ namespace EDBitor.Model
             using (var command = connection.CreateCommand()
                                             .Update(Scheme.Table)
                                             .Set(new[] { new Tuple<string, string>("data", dataParam) })
-                                            .Where("{0}={1}", Scheme.Columns.Id, id))
+                                            .Where("{0}={1}", Scheme.Columns.Id, id)
+                                            .Async())
             {
                 command.Parameters.Add(dataParam, DbType.Binary).Value = _compressor.Compress(file);
-                command.ExecuteNonQuery();
+                await command.ExecuteNonQuery();
             }
 
             _isStorageEdited = true;
         }
 
-        public void DeleteFile(FileInfo info)
+        public async Task DeleteFile(int id)
         {
-            if (info.Id == null)
-                throw new ArgumentException("File id can't be null for delete operation.", nameof(info));
+            if (id <= 0)
+                throw new ArgumentException("File id can't be equal or less zero for delete operation.", nameof(id));
 
             using (var connection = _connectionFactory.CreateConnection().OpenAndReturn())
             using (var command = connection.CreateCommand()
-                .Delete()
-                .From(Scheme.Table)
-                .Where("{0}={1}", Scheme.Columns.Id, info.Id.Value.ToString()))
+                                            .Delete()
+                                            .From(Scheme.Table)
+                                            .Where("{0}={1}", Scheme.Columns.Id, id.ToString())
+                                            .Async())
             {
-                command.ExecuteNonQuery();
+                await command.ExecuteNonQuery();
             }
 
             _isStorageEdited = true;
@@ -150,11 +163,11 @@ namespace EDBitor.Model
 
         #region Helpers
 
-        private void Read(SQLiteCommand command, Action<SQLiteDataReader> forEach)
+        private async Task Read(AsyncSQLiteCommand command, Action<SQLiteDataReader> forEach)
         {
-            using (var reader = command.ExecuteReader())
+            using (var reader = await command.ExecuteReader())
             {
-                while (reader.Read())
+                while (await reader.ReadAsync())
                     forEach(reader);
             }
         }

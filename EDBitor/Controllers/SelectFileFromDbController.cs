@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows.Forms;
 using EDBitor.Controllers.Base;
 using EDBitor.Model;
@@ -7,12 +8,12 @@ using EDBitor.View.MessageBoxShowers;
 
 namespace EDBitor.Controllers
 {
-    class OpenFileController : DialogController<OpenFileFromDbDialog, FileInfo?>
+    class SelectFileFromDbController : DialogController<SelectFileFromDbDialog, FileInfo?>
     {
         private class ListItem
         {
             public int Id;
-            public string FileName;
+            public string FileName { get; } // for list view
 
             public ListItem(FileInfo info)
             {
@@ -23,11 +24,11 @@ namespace EDBitor.Controllers
             }
         }
 
-        private readonly WarningMessageBoxShower _messageBoxShower;
+        private readonly MessageBoxShower _messageBoxShower;
 
         private Storage _storage;
 
-        public OpenFileController()
+        public SelectFileFromDbController()
         {
             _messageBoxShower = new WarningMessageBoxShower();
         }
@@ -37,18 +38,19 @@ namespace EDBitor.Controllers
         protected override void Initialized()
         {
             _storage = App.Model.Storage;
+            FillList();
         }
 
         protected override void Subscribe()
         {
-            Form.OpenFileButton.Click += OnOpenFileButtonClick;
+            Form.SelectFileButton.Click += OnOpenFileButtonClick;
         }
 
-        protected override void BeforeShowView()
+        protected override HashSet<Control> VisibleUntilBlock()
         {
-            FillList();
+            return new HashSet<Control> { Form.WaitPanel };
         }
-        
+
         #endregion
 
         #region View event handlers
@@ -71,9 +73,18 @@ namespace EDBitor.Controllers
 
         #region Helpers
 
-        private void FillList()
+        private async void FillList()
         {
-            var infos = _storage.GetFileList();
+            BlockUi();
+            var infos = await _storage.GetFileList();
+            UnblockUi();
+
+            if (infos.Count == 0)
+            {
+                _messageBoxShower.Show("No file in db");
+                Close();
+            }
+
             for (int i = 0; i < infos.Count; i++)
             {
                 var item = new ListItem(infos[i]);

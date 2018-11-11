@@ -42,7 +42,6 @@
       <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
@@ -57,7 +56,6 @@
     </Reference>
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\Base\DialogController.cs" />
@@ -69,6 +67,7 @@
     <Compile Include="Controllers\Base\FormController.cs" />
     <Compile Include="ControllerLocator.cs" />
     <Compile Include="EDBitorApp.cs" />
+    <Compile Include="Model\AsyncSQLiteCommand.cs" />
     <Compile Include="Model\EDBitorModel.cs" />
     <Compile Include="Model\DataCompressor.cs" />
     <Compile Include="Model\FileInfo.cs" />
@@ -78,7 +77,7 @@
     <Compile Include="View\EditorForm.Designer.cs">
       <DependentUpon>EditorForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Controllers\OpenFileController.cs" />
+    <Compile Include="Controllers\SelectFileFromDbController.cs" />
     <Compile Include="View\EnterFileNameDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -86,12 +85,13 @@
       <DependentUpon>EnterFileNameDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="View\MessageBoxShowers\MessageBoxShower.cs" />
+    <Compile Include="View\MessageBoxShowers\QuestionMessageBoxShower.cs" />
     <Compile Include="View\MessageBoxShowers\WarningMessageBoxShower.cs" />
-    <Compile Include="View\OpenFileFromDbDialog.cs">
+    <Compile Include="View\SelectFileFromDbDialog.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="View\OpenFileFromDbDialog.Designer.cs">
-      <DependentUpon>OpenFileFromDbDialog.cs</DependentUpon>
+    <Compile Include="View\SelectFileFromDbDialog.Designer.cs">
+      <DependentUpon>SelectFileFromDbDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -104,8 +104,8 @@
     <EmbeddedResource Include="View\EnterFileNameDialog.resx">
       <DependentUpon>EnterFileNameDialog.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="View\OpenFileFromDbDialog.resx">
-      <DependentUpon>OpenFileFromDbDialog.cs</DependentUpon>
+    <EmbeddedResource Include="View\SelectFileFromDbDialog.resx">
+      <DependentUpon>SelectFileFromDbDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

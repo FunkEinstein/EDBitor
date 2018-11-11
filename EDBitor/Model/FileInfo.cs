@@ -10,13 +10,5 @@
             Id = id;
             FileName = fileName;
         }
-
-        public FileInfo(string fileName)
-            : this(null, fileName)
-        { }
-
-        public FileInfo(int? id)
-            : this(id, null)
-        { }
     }
 }

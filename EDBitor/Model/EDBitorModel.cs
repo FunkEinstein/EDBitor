@@ -1,13 +1,13 @@
-﻿using System;
-
-namespace EDBitor.Model
+﻿namespace EDBitor.Model
 {
     class EDBitorModel
     {
-        private Lazy<Storage> _storage = new Lazy<Storage>(() => new Storage(new DataCompressor()));
-        public Storage Storage
+        public Storage Storage { get; }
+
+        public EDBitorModel()
         {
-            get { return _storage.Value; }
+            var compressor = new DataCompressor();
+            Storage = new Storage(compressor);
         }
     }
 }

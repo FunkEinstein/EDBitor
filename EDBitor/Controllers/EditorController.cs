@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Windows.Forms;
 using EDBitor.Controllers.Base;
@@ -30,17 +31,18 @@ namespace EDBitor.Controllers
             }
         }
 
+        private const string FormTitle = "EDBitor";
         private const string NewFileHeader = "New file";
         private const string FileChangedMarker = "*";
 
-        private readonly WarningMessageBoxShower _messageBoxShower;
+        private readonly MessageBoxShower _questionShower;
 
         private Storage _storage;
         private FileStatus _currentFileStatus;
 
         public EditorController()
         {
-            _messageBoxShower = new WarningMessageBoxShower();
+            _questionShower = new QuestionMessageBoxShower();
         }
 
         #region View controller
@@ -49,6 +51,10 @@ namespace EDBitor.Controllers
         {
             _storage = App.Model.Storage;
             _currentFileStatus = new FileStatus(Form.EditorTextBox);
+
+            Xm
+
+            CreateNewFile();
         }
 
         protected override void Subscribe()
@@ -56,12 +62,23 @@ namespace EDBitor.Controllers
             Form.FormClosed += OnExit;
 
             Form.CreateMenuItem.Click += OnCreateFile;
+
             Form.OpenFromDiskMenuItem.Click += OnOpenFileFromDisk;
             Form.OpenFromDBMenuItem.Click += OnOpenFileFromDb;
+
             Form.SaveMenuItem.Click += OnSaveFile;
+
             Form.ExitMenuItem.Click += OnExit;
 
+            Form.DeleteCurrentMenuItem.Click += OnDeleteCurrentMenuItemClick;
+            Form.DeleteFileFromDBMenuItem.Click += OnDeleteFileFromDBMenuItemClick; 
+
             Form.EditorTextBox.TextChanged += OnTextChanged;
+        }
+
+        protected override HashSet<Control> VisibleUntilBlock()
+        {
+            return new HashSet<Control> { Form.WaitPanel };
         }
 
         #endregion
@@ -70,9 +87,49 @@ namespace EDBitor.Controllers
 
         private void OnCreateFile(object sender, EventArgs e)
         {
+            if (_currentFileStatus.IsTextChanged.HasValue
+                && _currentFileStatus.IsTextChanged.Value)
+            {
+                var result = _questionShower.Show("Do you want save changes?");
+                if (result == DialogResult.Yes)
+                    SaveFile();
+            }
+
+            CreateNewFile();
+        }
+
+        private void CreateNewFile()
+        {
             SetFileId(null);
             SetFileName(null);
             SetText(string.Empty);
+        }
+
+        #endregion
+
+        #region Delete file
+
+        private async void OnDeleteCurrentMenuItemClick(object sender, EventArgs e)
+        {
+            var id = _currentFileStatus.Id;
+
+            CreateNewFile();
+
+            if (id.HasValue)
+                await _storage.DeleteFile(id.Value);
+        }
+
+        private async void OnDeleteFileFromDBMenuItemClick(object sender, EventArgs e)
+        {
+            var fileInfo = App.Locator.OpenDialog<SelectFileFromDbController, FileInfo?>(Form);
+            if (!fileInfo.HasValue)
+                return;
+
+            if (!fileInfo.Value.Id.HasValue)
+                throw new InvalidOperationException("File id can't be null for open operation");
+
+            var id = fileInfo.Value.Id.Value;
+            await _storage.DeleteFile(id);
         }
 
         #endregion
@@ -92,7 +149,7 @@ namespace EDBitor.Controllers
 
         private void OnOpenFileFromDb(object sender, EventArgs e)
         {
-            var fileInfo = App.Locator.OpenDialog<OpenFileController, FileInfo?>(Form);
+            var fileInfo = App.Locator.OpenDialog<SelectFileFromDbController, FileInfo?>(Form);
             if (!fileInfo.HasValue)
                 return;
 
@@ -108,16 +165,18 @@ namespace EDBitor.Controllers
             SetText(text);
         }
 
-        private void OpenFile(FileInfo info)
+        private async void OpenFile(FileInfo fileInfo)
         {
-            if (!info.Id.HasValue)
+            if (!fileInfo.Id.HasValue)
                 throw new InvalidOperationException("File id can't be null for open operation");
 
-            SetFileId(info.Id.Value);
-            SetFileName(info.FileName);
+            SetFileId(fileInfo.Id.Value);
+            SetFileName(fileInfo.FileName);
 
-            var text = _storage.GetFile(info.Id.Value);
+            BlockUi();
+            var text = await _storage.GetFile(fileInfo.Id.Value);
             SetText(text);
+            UnblockUi();
         }
 
         #endregion
@@ -126,15 +185,17 @@ namespace EDBitor.Controllers
 
         private void OnSaveFile(object sender, EventArgs e)
         {
-            var text = _currentFileStatus.Text;
-            if (!string.IsNullOrEmpty(_currentFileStatus.FileName) 
-                && !string.IsNullOrEmpty(text))
-            {
-                _messageBoxShower.Show("Here is no file to save");
-                return;
-            }
+            SaveFile();
+        }
 
+        private void SaveFile()
+        {
+            var text = _currentFileStatus.Text;
             var id = _currentFileStatus.Id;
+            if (id.HasValue
+                && string.IsNullOrEmpty(_currentFileStatus.FileName))
+                throw new InvalidOperationException("File can't has id and doesn't have name");
+
             if (id.HasValue)
                 UpdateFile(id.Value, text);
             else
@@ -143,12 +204,12 @@ namespace EDBitor.Controllers
             MarkAsUnchanged();
         }
 
-        private void UpdateFile(int id, string text)
+        private async void UpdateFile(int id, string text)
         {
-            _storage.UpdateFile(id, text);
+            await _storage.UpdateFile(id, text);
         }
 
-        private void AddFile(string text)
+        private async void AddFile(string text)
         {
             var fileName = App.Locator.OpenDialog<EnterFileNameController, string>(Form);
             if (string.IsNullOrEmpty(fileName))
@@ -156,10 +217,10 @@ namespace EDBitor.Controllers
 
             SetFileName(fileName);
 
-            // ReSharper disable once PossibleInvalidOperationException
-            // _currentFileInfo.Value must be initialized by SetFileInfo
-            var id = _storage.AddFile(fileName, text);
+            BlockUi();
+            var id = await _storage.AddFile(fileName, text);
             SetFileId(id);
+            UnblockUi();
         }
 
         #endregion
@@ -182,13 +243,14 @@ namespace EDBitor.Controllers
 
         private void MarkAsChanged()
         {
-            Form.Text = $@"{Form.Text} {FileChangedMarker}";
             _currentFileStatus.IsTextChanged = true;
+            Form.Text = FormatFormTitle(_currentFileStatus.FileName, _currentFileStatus.IsTextChanged.Value);
         }
 
         private void MarkAsUnchanged()
         {
             _currentFileStatus.IsTextChanged = false;
+            Form.Text = FormatFormTitle(_currentFileStatus.FileName, _currentFileStatus.IsTextChanged.Value);
         }
 
         #endregion
@@ -203,7 +265,7 @@ namespace EDBitor.Controllers
         public void SetFileName(string fileName)
         {
             _currentFileStatus.FileName = fileName;
-            Form.Text = fileName ?? NewFileHeader;
+            Form.Text = FormatFormTitle(fileName);
         }
 
         public void SetText(string text)
@@ -223,5 +285,16 @@ namespace EDBitor.Controllers
 
         #endregion
 
+        #region Helpers
+
+        private static string FormatFormTitle(string fileName = null, bool isFileChanged = false)
+        {
+            if (!isFileChanged)
+                return $@"{FormTitle} - {fileName ?? NewFileHeader}";
+
+            return $@"{FormTitle} - {fileName ?? NewFileHeader} {FileChangedMarker}";
+        }
+
+        #endregion
     }
 }

@@ -6,11 +6,21 @@ namespace EDBitor.Controllers.Base
     {
         protected TResult Result;
 
+        #region Open/Close
+
         TResult IDialogController<TResult>.OpenDialog(Form form)
         {
+            SubscribeToUserClosing();
             Subscribe();
 
-            BeforeShowView();
+            if (IsFormClosed)
+                return Result;
+
+            var controls = VisibleUntilBlock();
+            if (controls != null)
+                foreach (var control in controls)
+                    control.Visible = false;
+
             Form.ShowDialog(form);
             return Result;
         }
@@ -18,13 +28,40 @@ namespace EDBitor.Controllers.Base
         void IDialogController<TResult>.Close(TResult result)
         {
             Result = result;
-            Form.Close();
+
+            if (!IsFormClosed)
+                Form.Close();
+
+            IsFormClosed = true;
         }
 
-        protected void Close()
+        protected new void Close()
         {
             App.Locator.Close(this, Result);
         }
+
+        #endregion
+
+        #region Subscribing
+
+        private void SubscribeToUserClosing()
+        {
+            Form.FormClosing += OnFormClosing;
+        }
+
+        private void OnFormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (IsFormClosed)
+                return;
+
+            if (e.CloseReason == CloseReason.UserClosing)
+            {
+                IsFormClosed = true;
+                Close();
+            }
+        }
+
+        #endregion
     }
 
     abstract class DialogController<TForm, TResult> : DialogController<TResult>

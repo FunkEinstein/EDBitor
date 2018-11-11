@@ -74,5 +74,10 @@ namespace EDBitor.Model
             command.CommandText = "delete ";
             return command;
         }
+
+        public static AsyncSQLiteCommand Async(this SQLiteCommand command)
+        {
+            return new AsyncSQLiteCommand(command);
+        }
     }
 }

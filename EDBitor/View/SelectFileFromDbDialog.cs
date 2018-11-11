@@ -2,9 +2,9 @@
 
 namespace EDBitor.View
 {
-    public partial class OpenFileFromDbDialog : Form
+    public partial class SelectFileFromDbDialog : Form
     {
-        public OpenFileFromDbDialog()
+        public SelectFileFromDbDialog()
         {
             InitializeComponent();
         }

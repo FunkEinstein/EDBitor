@@ -1,7 +1,6 @@
 ﻿using System;
 using EDBitor.Controllers;
 using EDBitor.Model;
-using EDBitor.View;
 
 namespace EDBitor
 {
@@ -13,13 +12,13 @@ namespace EDBitor
             get { return _instance.Value; }
         }
 
-        private EDBitorModel _model = new EDBitorModel();
+        private readonly EDBitorModel _model = new EDBitorModel();
         public EDBitorModel Model
         {
             get { return _model; }
         }
 
-        private ControllerLocator _locator = new ControllerLocator();
+        private readonly ControllerLocator _locator = new ControllerLocator();
         public ControllerLocator Locator
         {
             get { return _locator; }
