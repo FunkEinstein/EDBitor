@@ -71,6 +71,23 @@
     <Compile Include="Model\EDBitorModel.cs" />
     <Compile Include="Model\DataCompressor.cs" />
     <Compile Include="Model\FileInfo.cs" />
+    <Compile Include="Parsers\CollectionExtentions.cs" />
+    <Compile Include="Parsers\ParseException.cs" />
+    <Compile Include="Parsers\Parser.cs" />
+    <Compile Include="Parsers\SchemaElements\Builders\BuilderFactory.cs" />
+    <Compile Include="Parsers\SchemaElements\Builders\IBuildingRules.cs" />
+    <Compile Include="Parsers\SchemaElements\Builders\XmlSchemaBuildingRules.cs" />
+    <Compile Include="Parsers\SchemaElements\SchemaAttribute.cs" />
+    <Compile Include="Parsers\SchemaElements\SchemaComment.cs" />
+    <Compile Include="Parsers\SchemaElements\SchemaConstant.cs" />
+    <Compile Include="Parsers\SchemaElements\SchemaElement.cs" />
+    <Compile Include="Parsers\SchemaElements\Schema.cs" />
+    <Compile Include="Parsers\SchemaElements\Builders\SchemaElementBuilder.cs" />
+    <Compile Include="Parsers\SchemaElements\Builders\SchemaElementBuildingException.cs" />
+    <Compile Include="Parsers\SchemaElements\SchemaHeader.cs" />
+    <Compile Include="Parsers\SchemaElements\SchemaValue.cs" />
+    <Compile Include="Parsers\SchemaElements\XmlSchema.cs" />
+    <Compile Include="Parsers\XmlParser.cs" />
     <Compile Include="View\EditorForm.cs">
       <SubType>Form</SubType>
     </Compile>

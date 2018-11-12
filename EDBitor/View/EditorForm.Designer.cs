@@ -43,6 +43,8 @@
             this.ExitMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.WaitPanel = new System.Windows.Forms.Panel();
             this.waitLable = new System.Windows.Forms.Label();
+            this.formatToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.BeautifyMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menu.SuspendLayout();
             this.WaitPanel.SuspendLayout();
             this.SuspendLayout();
@@ -62,7 +64,8 @@
             // 
             this.menu.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.menu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.FileMenuItem});
+            this.FileMenuItem,
+            this.formatToolStripMenuItem});
             this.menu.Location = new System.Drawing.Point(0, 0);
             this.menu.Name = "menu";
             this.menu.Size = new System.Drawing.Size(622, 28);
@@ -169,6 +172,20 @@
             this.waitLable.Text = "Please wait";
             this.waitLable.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
+            // formatToolStripMenuItem
+            // 
+            this.formatToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.BeautifyMenuItem});
+            this.formatToolStripMenuItem.Name = "formatToolStripMenuItem";
+            this.formatToolStripMenuItem.Size = new System.Drawing.Size(68, 24);
+            this.formatToolStripMenuItem.Text = "Format";
+            // 
+            // BeautifyMenuItem
+            // 
+            this.BeautifyMenuItem.Name = "BeautifyMenuItem";
+            this.BeautifyMenuItem.Size = new System.Drawing.Size(216, 26);
+            this.BeautifyMenuItem.Text = "Beautify";
+            // 
             // EditorForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -206,6 +223,8 @@
         public System.Windows.Forms.ToolStripMenuItem DeleteFileFromDBMenuItem;
         public System.Windows.Forms.Panel WaitPanel;
         private System.Windows.Forms.Label waitLable;
+        private System.Windows.Forms.ToolStripMenuItem formatToolStripMenuItem;
+        public System.Windows.Forms.ToolStripMenuItem BeautifyMenuItem;
     }
 }
 

@@ -4,6 +4,7 @@ using System.IO;
 using System.Windows.Forms;
 using EDBitor.Controllers.Base;
 using EDBitor.Model;
+using EDBitor.Parsers;
 using EDBitor.View;
 using EDBitor.View.MessageBoxShowers;
 using FileInfo = EDBitor.Model.FileInfo;
@@ -36,6 +37,7 @@ namespace EDBitor.Controllers
         private const string FileChangedMarker = "*";
 
         private readonly MessageBoxShower _questionShower;
+        private readonly WarningMessageBoxShower _warningShower;
 
         private Storage _storage;
         private FileStatus _currentFileStatus;
@@ -43,6 +45,7 @@ namespace EDBitor.Controllers
         public EditorController()
         {
             _questionShower = new QuestionMessageBoxShower();
+            _warningShower = new WarningMessageBoxShower();
         }
 
         #region View controller
@@ -51,8 +54,6 @@ namespace EDBitor.Controllers
         {
             _storage = App.Model.Storage;
             _currentFileStatus = new FileStatus(Form.EditorTextBox);
-
-            Xm
 
             CreateNewFile();
         }
@@ -71,11 +72,13 @@ namespace EDBitor.Controllers
             Form.ExitMenuItem.Click += OnExit;
 
             Form.DeleteCurrentMenuItem.Click += OnDeleteCurrentMenuItemClick;
-            Form.DeleteFileFromDBMenuItem.Click += OnDeleteFileFromDBMenuItemClick; 
+            Form.DeleteFileFromDBMenuItem.Click += OnDeleteFileFromDBMenuItemClick;
+
+            Form.BeautifyMenuItem.Click += OnBeautifyMenuItemClick;
 
             Form.EditorTextBox.TextChanged += OnTextChanged;
         }
-
+        
         protected override HashSet<Control> VisibleUntilBlock()
         {
             return new HashSet<Control> { Form.WaitPanel };
@@ -221,6 +224,20 @@ namespace EDBitor.Controllers
             var id = await _storage.AddFile(fileName, text);
             SetFileId(id);
             UnblockUi();
+        }
+
+        #endregion
+
+        #region Beautify
+
+        private void OnBeautifyMenuItemClick(object sender, EventArgs e)
+        {
+            var text = _currentFileStatus.Text;
+            if (string.IsNullOrEmpty(text))
+                _warningShower.Show("I can't beautify emptiness");
+
+            var parser = new XmlParser();
+            parser.Parse(text);
         }
 
         #endregion
