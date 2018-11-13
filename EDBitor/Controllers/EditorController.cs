@@ -2,12 +2,15 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Windows.Forms;
+using System.Xml;
 using EDBitor.Controllers.Base;
-using EDBitor.Model;
-using EDBitor.Parsers;
 using EDBitor.View;
 using EDBitor.View.MessageBoxShowers;
-using FileInfo = EDBitor.Model.FileInfo;
+using DocumentParsers.Parsers;
+using DocumentParsers.Exceptions;
+using System.Xml.Linq;
+using Model;
+using FileInfo = Model.FileInfo;
 
 namespace EDBitor.Controllers
 {
@@ -74,7 +77,8 @@ namespace EDBitor.Controllers
             Form.DeleteCurrentMenuItem.Click += OnDeleteCurrentMenuItemClick;
             Form.DeleteFileFromDBMenuItem.Click += OnDeleteFileFromDBMenuItemClick;
 
-            Form.BeautifyMenuItem.Click += OnBeautifyMenuItemClick;
+            Form.BeautifyByMeMenuItem.Click += OnBeautifyByMeClick;
+            Form.BeautifyByMicrosoftMenuItem.Click += OnBeautifyByMicrosoftClick;
 
             Form.EditorTextBox.TextChanged += OnTextChanged;
         }
@@ -124,7 +128,7 @@ namespace EDBitor.Controllers
 
         private async void OnDeleteFileFromDBMenuItemClick(object sender, EventArgs e)
         {
-            var fileInfo = App.Locator.OpenDialog<SelectFileFromDbController, FileInfo?>(Form);
+            var fileInfo = App.Instantiator.OpenDialog<SelectFileFromDbController, FileInfo?>(Form);
             if (!fileInfo.HasValue)
                 return;
 
@@ -152,7 +156,7 @@ namespace EDBitor.Controllers
 
         private void OnOpenFileFromDb(object sender, EventArgs e)
         {
-            var fileInfo = App.Locator.OpenDialog<SelectFileFromDbController, FileInfo?>(Form);
+            var fileInfo = App.Instantiator.OpenDialog<SelectFileFromDbController, FileInfo?>(Form);
             if (!fileInfo.HasValue)
                 return;
 
@@ -214,7 +218,7 @@ namespace EDBitor.Controllers
 
         private async void AddFile(string text)
         {
-            var fileName = App.Locator.OpenDialog<EnterFileNameController, string>(Form);
+            var fileName = App.Instantiator.OpenDialog<EnterFileNameController, string>(Form);
             if (string.IsNullOrEmpty(fileName))
                 return;
 
@@ -230,14 +234,45 @@ namespace EDBitor.Controllers
 
         #region Beautify
 
-        private void OnBeautifyMenuItemClick(object sender, EventArgs e)
+        private void OnBeautifyByMeClick(object sender, EventArgs e)
         {
             var text = _currentFileStatus.Text;
             if (string.IsNullOrEmpty(text))
+            {
                 _warningShower.Show("I can't beautify emptiness");
+                return;
+            }
 
-            var parser = new XmlParser();
-            parser.Parse(text);
+            // try
+            // {
+                var parser = new XmlDocumentParser();
+                var schema = parser.Parse(text);
+                _currentFileStatus.Text = parser.Stringify(schema);
+            // }
+            // catch (ParseException ex)
+            // {
+            //     _warningShower.Show($"Invalid xml document: {ex.Message}");
+            // }
+        }
+
+        private void OnBeautifyByMicrosoftClick(object sender, EventArgs e)
+        {
+            var text = _currentFileStatus.Text;
+            if (string.IsNullOrEmpty(text))
+            {
+                _warningShower.Show("I can't beautify emptiness");
+                return;
+            }
+
+            try
+            {
+                var document = XDocument.Parse(_currentFileStatus.Text);
+                _currentFileStatus.Text = document.ToString();
+            }
+            catch (XmlException ex)
+            {
+                _warningShower.Show($"Invalid xml document: {ex.Message}");
+            }
         }
 
         #endregion

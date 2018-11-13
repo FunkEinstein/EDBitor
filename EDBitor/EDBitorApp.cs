@@ -1,6 +1,5 @@
 ﻿using System;
 using EDBitor.Controllers;
-using EDBitor.Model;
 
 namespace EDBitor
 {
@@ -18,10 +17,10 @@ namespace EDBitor
             get { return _model; }
         }
 
-        private readonly ControllerLocator _locator = new ControllerLocator();
-        public ControllerLocator Locator
+        private readonly ControllerInstantiator _instantiator = new ControllerInstantiator();
+        public ControllerInstantiator Instantiator
         {
-            get { return _locator; }
+            get { return _instantiator; }
         }
 
         private EDBitorApp()
@@ -29,7 +28,8 @@ namespace EDBitor
 
         public void Start()
         {
-            _locator.Open<EditorController>();
+            AppDomain.CurrentDomain.SetData("DataDirectory", "../../../Data");
+            _instantiator.Open<EditorController>();
         }
     }
 }

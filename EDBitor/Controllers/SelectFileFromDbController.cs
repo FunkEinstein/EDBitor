@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Windows.Forms;
 using EDBitor.Controllers.Base;
-using EDBitor.Model;
 using EDBitor.View;
 using EDBitor.View.MessageBoxShowers;
+using Model;
 
 namespace EDBitor.Controllers
 {
@@ -85,9 +85,9 @@ namespace EDBitor.Controllers
                 Close();
             }
 
-            for (int i = 0; i < infos.Count; i++)
+            foreach (var info in infos)
             {
-                var item = new ListItem(infos[i]);
+                var item = new ListItem(info);
                 Form.FileList.Items.Add(item);
             }
         }

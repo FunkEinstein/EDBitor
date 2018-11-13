@@ -42,6 +42,7 @@
       <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
@@ -56,6 +57,8 @@
     </Reference>
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\Base\DialogController.cs" />
@@ -65,29 +68,9 @@
     <Compile Include="Controllers\EditorController.cs" />
     <Compile Include="Controllers\EnterFileNameController.cs" />
     <Compile Include="Controllers\Base\FormController.cs" />
-    <Compile Include="ControllerLocator.cs" />
+    <Compile Include="ControllerInstantiator.cs" />
     <Compile Include="EDBitorApp.cs" />
-    <Compile Include="Model\AsyncSQLiteCommand.cs" />
-    <Compile Include="Model\EDBitorModel.cs" />
-    <Compile Include="Model\DataCompressor.cs" />
-    <Compile Include="Model\FileInfo.cs" />
-    <Compile Include="Parsers\CollectionExtentions.cs" />
-    <Compile Include="Parsers\ParseException.cs" />
-    <Compile Include="Parsers\Parser.cs" />
-    <Compile Include="Parsers\SchemaElements\Builders\BuilderFactory.cs" />
-    <Compile Include="Parsers\SchemaElements\Builders\IBuildingRules.cs" />
-    <Compile Include="Parsers\SchemaElements\Builders\XmlSchemaBuildingRules.cs" />
-    <Compile Include="Parsers\SchemaElements\SchemaAttribute.cs" />
-    <Compile Include="Parsers\SchemaElements\SchemaComment.cs" />
-    <Compile Include="Parsers\SchemaElements\SchemaConstant.cs" />
-    <Compile Include="Parsers\SchemaElements\SchemaElement.cs" />
-    <Compile Include="Parsers\SchemaElements\Schema.cs" />
-    <Compile Include="Parsers\SchemaElements\Builders\SchemaElementBuilder.cs" />
-    <Compile Include="Parsers\SchemaElements\Builders\SchemaElementBuildingException.cs" />
-    <Compile Include="Parsers\SchemaElements\SchemaHeader.cs" />
-    <Compile Include="Parsers\SchemaElements\SchemaValue.cs" />
-    <Compile Include="Parsers\SchemaElements\XmlSchema.cs" />
-    <Compile Include="Parsers\XmlParser.cs" />
+    <Compile Include="EDBitorModel.cs" />
     <Compile Include="View\EditorForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -112,9 +95,6 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Model\SqlCommandBuilder.cs" />
-    <Compile Include="Model\SQLiteConnectionFactory.cs" />
-    <Compile Include="Model\Storage.cs" />
     <EmbeddedResource Include="View\EditorForm.resx">
       <DependentUpon>EditorForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -146,6 +126,16 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DocumentParsers\DocumentParsers.csproj">
+      <Project>{68c6107e-6742-44e2-b73e-21abdf0febbb}</Project>
+      <Name>DocumentParsers</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Model\Model.csproj">
+      <Project>{725431b6-57ff-4295-92c7-02c3352e0175}</Project>
+      <Name>Model</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\System.Data.SQLite.Core.1.0.109.2\build\net46\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.109.2\build\net46\System.Data.SQLite.Core.targets')" />

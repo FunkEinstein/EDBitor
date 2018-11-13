@@ -41,10 +41,12 @@
             this.SaveMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.SeparatorMenuItem = new System.Windows.Forms.ToolStripSeparator();
             this.ExitMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.WaitPanel = new System.Windows.Forms.Panel();
-            this.waitLable = new System.Windows.Forms.Label();
             this.formatToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.BeautifyMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.WaitPanel = new System.Windows.Forms.Panel();
+            this.waitLable = new System.Windows.Forms.Label();
+            this.BeautifyByMeMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.BeautifyByMicrosoftMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menu.SuspendLayout();
             this.WaitPanel.SuspendLayout();
             this.SuspendLayout();
@@ -150,6 +152,23 @@
             this.ExitMenuItem.Size = new System.Drawing.Size(128, 26);
             this.ExitMenuItem.Text = "Exit";
             // 
+            // formatToolStripMenuItem
+            // 
+            this.formatToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.BeautifyMenuItem});
+            this.formatToolStripMenuItem.Name = "formatToolStripMenuItem";
+            this.formatToolStripMenuItem.Size = new System.Drawing.Size(68, 24);
+            this.formatToolStripMenuItem.Text = "Format";
+            // 
+            // BeautifyMenuItem
+            // 
+            this.BeautifyMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.BeautifyByMeMenuItem,
+            this.BeautifyByMicrosoftMenuItem});
+            this.BeautifyMenuItem.Name = "BeautifyMenuItem";
+            this.BeautifyMenuItem.Size = new System.Drawing.Size(216, 26);
+            this.BeautifyMenuItem.Text = "Beautify XML by ";
+            // 
             // WaitPanel
             // 
             this.WaitPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -172,19 +191,17 @@
             this.waitLable.Text = "Please wait";
             this.waitLable.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // formatToolStripMenuItem
+            // BeautifyByMeMenuItem
             // 
-            this.formatToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.BeautifyMenuItem});
-            this.formatToolStripMenuItem.Name = "formatToolStripMenuItem";
-            this.formatToolStripMenuItem.Size = new System.Drawing.Size(68, 24);
-            this.formatToolStripMenuItem.Text = "Format";
+            this.BeautifyByMeMenuItem.Name = "BeautifyByMeMenuItem";
+            this.BeautifyByMeMenuItem.Size = new System.Drawing.Size(216, 26);
+            this.BeautifyByMeMenuItem.Text = "Me";
             // 
-            // BeautifyMenuItem
+            // BeautifyByMicrosoftMenuItem
             // 
-            this.BeautifyMenuItem.Name = "BeautifyMenuItem";
-            this.BeautifyMenuItem.Size = new System.Drawing.Size(216, 26);
-            this.BeautifyMenuItem.Text = "Beautify";
+            this.BeautifyByMicrosoftMenuItem.Name = "BeautifyByMicrosoftMenuItem";
+            this.BeautifyByMicrosoftMenuItem.Size = new System.Drawing.Size(216, 26);
+            this.BeautifyByMicrosoftMenuItem.Text = "Microsoft";
             // 
             // EditorForm
             // 
@@ -224,7 +241,9 @@
         public System.Windows.Forms.Panel WaitPanel;
         private System.Windows.Forms.Label waitLable;
         private System.Windows.Forms.ToolStripMenuItem formatToolStripMenuItem;
-        public System.Windows.Forms.ToolStripMenuItem BeautifyMenuItem;
+        public System.Windows.Forms.ToolStripMenuItem BeautifyByMeMenuItem;
+        public System.Windows.Forms.ToolStripMenuItem BeautifyByMicrosoftMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem BeautifyMenuItem;
     }
 }
 

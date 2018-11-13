@@ -37,7 +37,7 @@ namespace EDBitor.Controllers.Base
 
         protected new void Close()
         {
-            App.Locator.Close(this, Result);
+            App.Instantiator.Close(this, Result);
         }
 
         #endregion

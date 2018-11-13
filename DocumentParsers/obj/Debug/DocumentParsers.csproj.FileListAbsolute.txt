@@ -1,0 +1,6 @@
+D:\Projects\EDBitor\DocumentParsers\bin\Debug\DocumentParsers.dll
+D:\Projects\EDBitor\DocumentParsers\bin\Debug\DocumentParsers.pdb
+D:\Projects\EDBitor\DocumentParsers\obj\Debug\DocumentParsers.csproj.CoreCompileInputs.cache
+D:\Projects\EDBitor\DocumentParsers\obj\Debug\DocumentParsers.dll
+D:\Projects\EDBitor\DocumentParsers\obj\Debug\DocumentParsers.pdb
+D:\Projects\EDBitor\DocumentParsers\obj\Debug\DocumentParsers.csprojAssemblyReference.cache

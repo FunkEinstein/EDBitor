@@ -1,0 +1,8 @@
+﻿<dir Name="Documents" CreationTime="06/30/2018 20:44:03" LastAccessTime="10/30/2018 19:27:10" LastWriteTime="10/29/2018 14:52:54" Attributes="ReadOnly, Directory" Owner="VIACHESLAV\Viacheslav" UserRights="Allow: FullControl, Modify, Synchronize, ReadAndExecute, Synchronize; Deny:" Size="008393266708">
+  <dir Name="WindowsPowerShell" CreationTime="09/25/2018 15:53:47" LastAccessTime="10/28/2018 20:50:20" LastWriteTime="10/25/2018 16:17:06" Attributes="Directory" Owner="BUILTIN\Administrators" UserRights="Allow: FullControl, Modify, Synchronize, ReadAndExecute, Synchronize; Deny:" Size="000000000127">
+    <dir Name="Scripts" CreationTime="10/25/2018 16:17:06" LastAccessTime="10/25/2018 16:17:06" LastWriteTime="10/25/2018 16:17:06" Attributes="Directory" Owner="BUILTIN\Administrators" UserRights="Allow: FullControl, Modify, Synchronize, ReadAndExecute, Synchronize; Deny:" Size="000000000000">
+      <dir Name="InstalledScriptInfos" CreationTime="10/25/2018 16:17:06" LastAccessTime="10/25/2018 16:17:06" LastWriteTime="10/25/2018 16:17:06" Attributes="Directory" Owner="BUILTIN\Administrators" UserRights="Allow: FullControl, Modify, Synchronize, ReadAndExecute, Synchronize; Deny:" Size="000000000000"></dir>
+    </dir>
+    <file Name="Microsoft.PowerShell_profile.ps1" CreationTime="09/25/2018 16:19:29" LastAccessTime="10/30/2018 16:37:59" LastWriteTime="10/25/2018 16:07:21" Attributes="Archive" Owner="BUILTIN\Administrators" UserRights="Allow: FullControl, Modify, Synchronize, ReadAndExecute, Synchronize Deny:" Size="127" />
+  </dir>
+</dir>
