@@ -61,16 +61,6 @@ namespace Tests.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &lt;dir Name=&quot;Documents&quot; CreationTime=&quot;06/30/2018 20:44:03&quot; LastAccessTime=&quot;10/30/2018 19:27:10&quot; LastWriteTime=&quot;10/29/2018 14:52:54&quot; Attributes=&quot;ReadOnly, Directory&quot; Owner=&quot;VIACHESLAV\Viacheslav&quot; UserRights=&quot;Allow: FullControl, Modify, Synchronize, ReadAndExecute, Synchronize; Deny:&quot; Size=&quot;008393266708&quot;&gt;
-        ///  &lt;dir Name=&quot;WindowsPowerShell&quot; CreationTime=&quot;09/25/2018 15:53:47&quot; LastAccessTime=&quot;10/28/2018 20:50:20&quot; LastWriteTime=&quot;10/25/2018 16:17:06&quot; Attributes=&quot;Directory&quot; Owner=&quot;BUILTIN\Administrators&quot; UserRights=&quot;Al [rest of string was truncated]&quot;;.
-        /// </summary>
-        internal static string XMLDocument {
-            get {
-                return ResourceManager.GetString("XMLDocument", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to &lt;bigtext&gt;
         ///  When exchanging data between a browser and a server, the data can only be text.
         ///  ?&gt;

@@ -63,7 +63,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="XMLDocument.xml" />
     <Content Include="XMLDocumentWithTwoElements.xml" />
     <Content Include="XMLDocumentWithConstant.xml" />
   </ItemGroup>

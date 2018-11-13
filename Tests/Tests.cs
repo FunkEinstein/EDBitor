@@ -39,19 +39,5 @@ namespace Tests
             Assert.AreEqual(schema.Root.Children.Count, 1);
             Assert.IsInstanceOf<SchemaConstant>(schema.Root.Children[0]);
         }
-
-        [Test]
-        public void GivenStrangeDocument_WhenParseDocument_ThenEverythingOk()
-        {
-            // given
-            var document = Resources.ResourceManager.GetString("XMLDocument");
-
-            // when
-            var parser = new XmlDocumentParser();
-            var schema = parser.Parse(document);
-
-            // then
-            Assert.IsNotNull(schema);
-        }
     }
 }
